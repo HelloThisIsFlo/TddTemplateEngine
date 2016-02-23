@@ -1,5 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Template {
 
@@ -33,13 +35,11 @@ public class Template {
     }
 
     private void checkForMissingValuesAfterTemplateEvaluated(String evaluatedTemplate) throws MissingValueException {
-        if (variablesNotMatchedLeft(evaluatedTemplate)) {
-            throw new MissingValueException();
+        String matchAnyVariable = "\\$\\{.+\\}";
+        Matcher matcher = Pattern.compile(matchAnyVariable).matcher(evaluatedTemplate);
+        if (matcher.find()) {
+            throw new MissingValueException("No value for " + matcher.group());
         }
-    }
-
-    private boolean variablesNotMatchedLeft(String text) {
-        return text.matches(".*\\$\\{.+\\}.*");
     }
 
     private String makeFindRegex(String toFind) {

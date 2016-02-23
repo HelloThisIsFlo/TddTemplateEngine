@@ -2,6 +2,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestTemplate {
 
@@ -26,9 +27,14 @@ public class TestTemplate {
         assertTemplateEvaluatesTo("1, 2, 3");
     }
 
-    @Test (expected = MissingValueException.class)
+    @Test
     public void missingVariable_throwException() throws Exception {
-        new Template("${foo}").evaluate();
+        try {
+            new Template("${foo}").evaluate();
+            fail("MissingValueException expected but nothing thrown");
+        } catch (MissingValueException expected) {
+            assertEquals("No value for ${foo}", expected.getMessage());
+        }
     }
 
     private void assertTemplateEvaluatesTo(String expected) throws Exception {
