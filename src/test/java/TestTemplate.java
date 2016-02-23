@@ -1,37 +1,32 @@
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestTemplate {
 
-    @Test
-    public void oneVariable_returnFormattedText() throws Exception {
-        Template template = new Template("Hello, ${name}");
-        template.set("name", "Reader");
-        assertEquals("Hello, Reader", template.evaluate());
-    }
+    Template template;
 
-    @Test
-    public void differentTemplate_returnFormattedText() throws Exception {
-        Template template = new Template("Hi, ${name}");
-        template.set("name", "Someone else");
-        assertEquals("Hi, Someone else", template.evaluate());
+    @Before
+    public void setUp() throws Exception {
+        template = new Template("${one}, ${two}, ${three}");
+        template.set("one", "1");
+        template.set("two", "2");
+        template.set("three", "3");
     }
 
     @Test
     public void multipleVariables_returnFormatterText() throws Exception {
-        Template template = new Template("${one}, ${two}, ${three}");
-        template.set("one", "1");
-        template.set("two", "2");
-        template.set("three", "3");
-        assertEquals("1, 2, 3", template.evaluate());
+        assertTemplateEvaluatesTo("1, 2, 3");
     }
 
     @Test
     public void unknownVariable_ignoresIt() throws Exception {
-        Template template = new Template("Hello, ${name}");
-        template.set("name", "Reader");
         template.set("doesNotExist", "Hi");
-        assertEquals("Hello, Reader", template.evaluate());
+        assertTemplateEvaluatesTo("1, 2, 3");
+    }
+
+    private void assertTemplateEvaluatesTo(String expected) {
+        assertEquals(expected, template.evaluate());
     }
 }
