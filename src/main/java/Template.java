@@ -1,7 +1,6 @@
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Template {
 
@@ -18,28 +17,50 @@ public class Template {
     }
 
     public String evaluate() throws MissingValueException {
-        String result = replaceVariablesWithValues();
-        checkForMissingValuesAfterTemplateEvaluated(result);
-        return result;
+        TemplateParser parser = new TemplateParser();
+        List<String> segments = parser.parse(templateText);
+        return concatenate(segments);
     }
 
-    private String replaceVariablesWithValues() {
-        String result = templateText;
-        for (Map.Entry<String, String> entry: variables.entrySet()) {
-            String variable = entry.getKey();
-            String value = entry.getValue();
-            String regex = makeFindRegex(variable);
-            result = result.replaceAll(regex, value);
+    private String concatenate(List<String> segments) throws MissingValueException {
+        StringBuilder result = new StringBuilder();
+        for (String segment : segments) {
+            append(segment, result);
         }
-        return result;
+        return result.toString();
     }
 
-    private void checkForMissingValuesAfterTemplateEvaluated(String evaluatedTemplate) throws MissingValueException {
-        String matchAnyVariable = "\\$\\{.+\\}";
-        Matcher matcher = Pattern.compile(matchAnyVariable).matcher(evaluatedTemplate);
-        if (matcher.find()) {
-            throw new MissingValueException("No value for " + matcher.group());
+    private void append(String segment, StringBuilder result) throws MissingValueException {
+        if (isAVariable(segment)) {
+            appendVariable(segment, result);
+        } else {
+            appendPlainText(segment, result);
         }
+    }
+
+    private void appendVariable(String segment, StringBuilder result) throws MissingValueException {
+        String variable = extractVariable(segment);
+        String value = getValue(variable);
+        appendPlainText(value, result);
+    }
+
+    private StringBuilder appendPlainText(String segment, StringBuilder result) {
+        return result.append(segment);
+    }
+
+    private String getValue(String variable) throws MissingValueException {
+        if (!variables.containsKey(variable)) {
+            throw new MissingValueException("No value for ${" + variable + "}");
+        }
+        return variables.get(variable);
+    }
+
+    private String extractVariable(String segment) {
+        return segment.substring(2, segment.length() - 1);
+    }
+
+    private boolean isAVariable(String segment) {
+        return segment.startsWith("${") && segment.endsWith("}");
     }
 
     private String makeFindRegex(String toFind) {
