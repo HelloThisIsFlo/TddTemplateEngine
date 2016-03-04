@@ -1,3 +1,7 @@
+package root;
+
+import root.MissingValueException;
+import root.Template;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,7 +43,6 @@ public class TestTemplate {
     }
 
     @Test
-    @Ignore
     public void valueFormattedAsVariable_variableGetProcessedOnlyOnce() throws Exception {
         template.set("one", "${one}");
         template.set("two", "${two}");

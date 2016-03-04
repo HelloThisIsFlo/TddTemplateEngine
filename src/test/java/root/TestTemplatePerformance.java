@@ -1,3 +1,6 @@
+package root;
+
+import root.Template;
 import org.junit.Before;
 import org.junit.Test;
 

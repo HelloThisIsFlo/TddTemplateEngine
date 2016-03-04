@@ -1,3 +1,5 @@
+package root;
+
 public class MissingValueException extends Exception{
     public MissingValueException() {
     }
